@@ -21,13 +21,13 @@
 #define ACTIONDIALOG_H
 
 #include <QDialog>
+#include <QButtonGroup>
 
 #include "ui_ActionDialogBase.h"
 
 class Hotkey;
 class Action;
 class QRadioButton;
-class QButtonGroup;
 class ServerConfig;
 
 class ActionDialog : public QDialog, public Ui::ActionDialogBase
