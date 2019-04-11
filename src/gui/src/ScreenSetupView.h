@@ -21,6 +21,7 @@
 #define SCREENSETUPVIEW__H
 
 #include <QTableView>
+#include <QHeaderView>
 #include <QFlags>
 
 #include "Screen.h"
