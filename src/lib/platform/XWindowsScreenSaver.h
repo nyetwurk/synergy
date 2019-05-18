@@ -148,6 +148,9 @@ private:
     // DPMS screen saver settings
     bool                m_dpms;
     bool                m_dpmsEnabled;
+    UInt16              m_dpmsStandby;
+    UInt16              m_dpmsSuspend;
+    UInt16              m_dpmsOff;
 
     // true iff the client wants the screen saver suppressed
     bool                m_disabled;

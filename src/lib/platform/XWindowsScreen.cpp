@@ -433,7 +433,9 @@ XWindowsScreen::closeScreensaver()
 void
 XWindowsScreen::screensaver(bool activate)
 {
+	LOG((CLOG_DEBUG1 "screensaver %d", activate));
 	if (activate) {
+		LOG((CLOG_DEBUG1 "screen saver %d", activate));
 		m_screensaver->activate();
 	}
 	else {

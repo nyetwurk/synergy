@@ -113,8 +113,13 @@ XWindowsScreenSaver::XWindowsScreenSaver(
     XGetScreenSaver(m_display, &m_timeout, &m_interval,
                                 &m_preferBlanking, &m_allowExposures);
 
+    LOG((CLOG_DEBUG "m_timeout %d, m_interval %d, m_preferBlanking %d, m_allowExposures %d",
+	m_timeout, m_interval, m_preferBlanking, m_allowExposures));
     // get the DPMS settings
     m_dpmsEnabled = isDPMSEnabled();
+    DPMSGetTimeouts(m_display, &m_dpmsStandby, &m_dpmsSuspend, &m_dpmsOff);
+    LOG((CLOG_DEBUG "m_dpmsStandby %d, m_dpmsSuspend %d, m_mdpmsOff %d",
+	m_dpmsStandby, m_dpmsSuspend, m_dpmsOff));
 
     // get the xscreensaver window, if any
     if (!findXScreenSaver()) {
@@ -136,9 +141,15 @@ XWindowsScreenSaver::~XWindowsScreenSaver()
     m_events->removeHandler(Event::kTimer, this);
 
     if (m_display != NULL) {
+	LOG((CLOG_DEBUG "restoring dpms %d", m_dpmsEnabled));
         enableDPMS(m_dpmsEnabled);
+	LOG((CLOG_DEBUG "restoring m_timeout %d, m_interval %d, m_preferBlanking %d, m_allowExposures %d",
+	    m_timeout, m_interval, m_preferBlanking, m_allowExposures));
         XSetScreenSaver(m_display, m_timeout, m_interval,
                                 m_preferBlanking, m_allowExposures);
+	//LOG((CLOG_DEBUG "setting m_dpmsStandby %d, m_dpmsSuspend %d, m_mdpmsOff %d"
+	//DPMSSetTimeouts(m_display, m_dpmsStandby, m_dpmsSuspend, m_dpmsOff);
+	//	m_dpmsStandby, m_dpmsSuspend, m_dpmsOff));
         clearWatchForXScreenSaver();
         XWindowsUtil::ErrorLock lock(m_display);
         XSelectInput(m_display, DefaultRootWindow(m_display), m_rootEventMask);
@@ -221,10 +232,13 @@ XWindowsScreenSaver::enable()
     updateDisableTimer();
 
     // for built-in X screen saver
+    LOG((CLOG_DEBUG "setting m_timeout %d, m_interval %d, m_preferBlanking %d, m_allowExposures %d",
+	m_timeout, m_interval, m_preferBlanking, m_allowExposures));
     XSetScreenSaver(m_display, m_timeout, m_interval,
                                 m_preferBlanking, m_allowExposures);
 
     // for DPMS
+    LOG((CLOG_DEBUG "enable() calling enableDPMS(%d)", m_dpmsEnabled));
     enableDPMS(m_dpmsEnabled);
 }
 
@@ -238,11 +252,19 @@ XWindowsScreenSaver::disable()
     // use built-in X screen saver
     XGetScreenSaver(m_display, &m_timeout, &m_interval,
                                 &m_preferBlanking, &m_allowExposures);
+    LOG((CLOG_DEBUG "got m_timeout %d, m_interval %d, m_preferBlanking %d, m_allowExposures %d",
+	m_timeout, m_interval, m_preferBlanking, m_allowExposures));
+    LOG((CLOG_DEBUG "setting m_timeout %d, m_interval %d, m_preferBlanking %d, m_allowExposures %d",
+	0, m_interval, m_preferBlanking, m_allowExposures));
     XSetScreenSaver(m_display, 0, m_interval,
                                 m_preferBlanking, m_allowExposures);
 
     // for DPMS
     m_dpmsEnabled = isDPMSEnabled();
+    DPMSGetTimeouts(m_display, &m_dpmsStandby, &m_dpmsSuspend, &m_dpmsOff);
+    LOG((CLOG_DEBUG "m_dpmsStandby %d, m_dpmsSuspend %d, m_mdpmsOff %d",
+	m_dpmsStandby, m_dpmsSuspend, m_dpmsOff));
+    LOG((CLOG_DEBUG "disable() calling enableDPMS(%d)", false));
     enableDPMS(false);
 
     // FIXME -- now deactivate?
@@ -255,6 +277,7 @@ XWindowsScreenSaver::activate()
     m_suppressDisable = true;
     updateDisableTimer();
 
+    LOG((CLOG_DEBUG "activate() calling enableDPMS(%d)", m_dpmsEnabled));
     // enable DPMS if it was enabled
     enableDPMS(m_dpmsEnabled);
 
@@ -271,6 +294,7 @@ XWindowsScreenSaver::activate()
     }
 
     // try DPMS
+    LOG((CLOG_DEBUG "activate() calling activateDPMS(%d)", m_dpmsEnabled));
     activateDPMS(true);
 }
 
@@ -286,6 +310,7 @@ XWindowsScreenSaver::deactivate()
 
     // disable DPMS if screen saver is disabled
     if (m_disabled) {
+	LOG((CLOG_DEBUG "deactivate() calling enableDPMS(false)"));
         enableDPMS(false);
     }
 
@@ -556,6 +581,7 @@ XWindowsScreenSaver::activateDPMS(bool activate)
 void
 XWindowsScreenSaver::enableDPMS(bool enable)
 {
+    LOG((CLOG_DEBUG "enableDPMS %d", enable));
 #if HAVE_X11_EXTENSIONS_DPMS_H
     if (m_dpms) {
         if (enable) {
