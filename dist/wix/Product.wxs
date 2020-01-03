@@ -55,7 +55,8 @@
 			</RegistrySearch>
 		</Property>
 		<Condition Message="An existing installation of $(var.Name) was detected, please uninstall it before continuing.">NOT LEGACY_UNINSTALL_EXISTS
-    </Condition>
+		</Condition>
+<!--
 		<CustomAction ExeCommand="" FileKey="GuiProgram" Id="StartGui" Return="asyncNoWait"/>
 		<UI>
 		    <UIRef Id="WixUI_InstallDir" />
@@ -71,6 +72,7 @@
 			  Order="2">1</Publish>
 			<Publish Control="Finish" Dialog="ExitDialog" Event="DoAction" Value="StartGui">NOT Installed</Publish>
 		</UI>
+-->
 	</Product>
 	<Fragment>
 		<Directory Id="TARGETDIR" Name="SourceDir">
@@ -101,10 +103,11 @@
 				  <File Source="$(var.OpenSSLBinPath)/libssl-1_1-x64.dll"/>
 				  <File Source="$(var.OpenSSLBinPath)/libcrypto-1_1-x64.dll"/>
         <?else ?>
-          <File Source="$(var.OpenSSLBinPath)/libssl-1_1.dll"/>
-          <File Source="$(var.OpenSSLBinPath)/libcrypto-1_1.dll"/>
+				  <File Source="$(var.OpenSSLBinPath)/libssl-1_1.dll"/>
+				  <File Source="$(var.OpenSSLBinPath)/libcrypto-1_1.dll"/>
         <?endif ?>
 			</Component>
+<!--
 			<Component Guid="BAC8149B-6287-45BF-9C27-43D71ED40214" Id="Gui">
 				<File Id="GuiProgram" KeyPath="yes" Source="$(var.BinPath)/synergy.exe">
 					<Shortcut Advertise="yes" Directory="ProgramMenuFolder" Icon="synergy.ico" Id="GuiShortcut" Name="$(var.Name)"/>
@@ -118,7 +121,6 @@
 				<File Source="$(var.QtBinPath)\Qt5Widgetsd.dll"/>
 				<File Source="$(var.QtBinPath)\libGLESv2d.dll"/>
 				<File Source="$(var.QtBinPath)\libEGLd.dll"/>
-				<!-- Hacky -->
 				<File Source="C:\Program Files (x86)\Windows Kits\10\bin\$(var.Platform)\ucrt\ucrtbased.dll"/>
 				<?else ?>
 				<File Source="$(var.QtBinPath)\Qt5Core.dll"/>
@@ -130,6 +132,7 @@
 				<File Source="$(var.QtBinPath)\libEGL.dll"/>
 				<?endif ?>
 			</Component>
+-->
 		</ComponentGroup>
 		<ComponentGroup Directory="QTStylesDir" Id="ProductQtStylesComponents">
       <Component Guid="96E0F8D8-64FD-4CE8-94D1-F6EDCBBB4995" Id="Styles">
